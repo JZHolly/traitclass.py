@@ -50,6 +50,14 @@ class TraitedTests(TestCase):
         with self.assertRaises(IncorrectConfiguration):
             TraitedMeta('NoTraits', (), {})
 
+    def test_class_not_subclass_of_trait(self):
+        obj = SimpleTraitedClass()
+        self.assertFalse(issubclass(SimpleTraitedClass, SimpleTrait))
+
+    def test_trait_class_instantiated(self):
+        obj = SimpleTraitedClass()
+        self.assertTrue(isinstance(obj.__traitclass__, type))
+
     def test_private_attrs_of_traits_not_forwarded(self):
         obj = SimpleTraitedClass()
         with self.assertRaises(AttributeError):
