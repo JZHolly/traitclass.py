@@ -1,0 +1,8 @@
+language: python
+python:
+    - "3.4"
+install:
+    - "pip install nose flake8"
+script:
+    - "find . -name '*.py' -exec flake8 {} \;"
+    - "nosetests"
