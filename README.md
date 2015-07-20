@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/emintham/forest.py.svg?branch=master)](https://travis-ci.org/emintham/forest.py)
+[![Build Status](https://travis-ci.org/emintham/traitclass.py.svg?branch=master)](https://travis-ci.org/emintham/traitclass.py)
 
 
 A Python implementation of an ongoing research into OOP language design.
