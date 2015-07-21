@@ -129,3 +129,11 @@ class TraitedTests(TestCase):
                             OtherTrait]
         for trait in component_traits:
             self.assertTrue(ComplexTraitedClass.__extends__(trait))
+
+    def test_subclassing_preserves_traits(self):
+        subclass = type('ComplexTraitedSubclass', (ComplexTraitedClass,), {})
+        component_traits = [SimpleTrait, SubclassedTrait, OtherSubclassedTrait,
+                            OtherTrait]
+
+        for trait in component_traits:
+            self.assertTrue(subclass.__extends__(trait))
