@@ -33,6 +33,36 @@ class SimpleTraitedClass(metaclass=TraitedMeta):
     __traits__ = (SimpleTrait, )
 
 
+class SubclassedTrait(SimpleTrait):
+    @property
+    def is_simple(self):
+        return not super(SubclassedTrait, self).is_simple
+
+    def simple_simple_method(self):
+        return super(SubclassedTrait, self).simple_method() * 2
+
+    def new_method(self, foo, bar):
+        return foo * bar
+
+
+class OtherTrait(object):
+    pass
+
+
+class OtherSubclassedTrait(SimpleTrait):
+    @property
+    def is_simple(self):
+        return 'I am not simple'
+
+
+class ComplexTraitedClass(metaclass=TraitedMeta):
+    __traits__ = (SubclassedTrait, OtherSubclassedTrait, OtherTrait)
+
+
+class ComplexTrait(SubclassedTrait, OtherSubclassedTrait, OtherTrait):
+    pass
+
+
 class GetAttrClass(metaclass=TraitedMeta):
     __traits__ = tuple()
 
@@ -87,3 +117,15 @@ class TraitedTests(TestCase):
 
         self.assertTrue(obj.foo)
         self.assertTrue(obj.__undefinedattr__)
+
+    def test_trait_inheritance(self):
+        component_traits = [SimpleTrait, SubclassedTrait, OtherSubclassedTrait,
+                            OtherTrait, ComplexTrait]
+        for trait in component_traits:
+            self.assertTrue(issubclass(ComplexTrait, trait))
+
+    def test_extends(self):
+        component_traits = [SimpleTrait, SubclassedTrait, OtherSubclassedTrait,
+                            OtherTrait]
+        for trait in component_traits:
+            self.assertTrue(ComplexTraitedClass.__extends__(trait))

@@ -5,6 +5,19 @@ class IncorrectConfiguration(Exception):
     """Raised when TraitedMeta classes are incorrectly defined."""
 
 
+def extends(cls, trait):
+    """
+    Takes a class and a trait, returns True iff the class extends the trait.
+    """
+    try:
+        cls_traitcls = cls.__traitclass__
+    except AttributeError:
+        raise Exception(
+            '__traitclass__ not found in {}'.format(cls.__name__))
+
+    return issubclass(cls_traitcls, trait)
+
+
 class TraitedMeta(type):
     def __new__(mcs, name, bases, attrs):
         cls = super(TraitedMeta, mcs).__new__(mcs, name, bases, attrs)
@@ -15,12 +28,17 @@ class TraitedMeta(type):
             error = 'Instances of metaclass {} expects a __traits__ defined!'
             raise IncorrectConfiguration(error.format(mcs.__class__.__name__))
 
-        trait_cls = type('Trait', traits, {})
+        trait_cls = type(name + 'Trait', traits, {})
         cls.__traitclass__ = trait_cls
 
         old_getattr = getattr(cls, '__getattr__', None)
 
         def getattr_from_trait_cls(obj, attr):
+            """
+            Takes an object, an attribute and the object's __getattr__.
+            We first looks up the attribute on the object, if the attribute is not
+            found on the object, looks up the attribute on the objects __traitclass__
+            """
             cls_name = obj.__class__.__name__
 
             if old_getattr:
@@ -46,5 +64,7 @@ class TraitedMeta(type):
                 return result
 
         cls.__getattr__ = getattr_from_trait_cls
+
+        cls.__extends__ = classmethod(extends)
 
         return cls
