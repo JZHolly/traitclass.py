@@ -88,16 +88,16 @@ class TraitedTests(TestCase):
         obj = SimpleTraitedClass()
         self.assertTrue(isinstance(obj.__traitclass__, type))
 
-    def test_private_attrs_of_traits_not_forwarded(self):
+    def test_private_attrs_of_traits_not_lifted(self):
         obj = SimpleTraitedClass()
         with self.assertRaises(AttributeError):
             getattr(obj.__privateattr__)
 
-    def test_property_of_traits_forwarded(self):
+    def test_property_of_traits_lifted(self):
         obj = SimpleTraitedClass()
         self.assertTrue(obj.is_simple)
 
-    def test_method_of_traits_forwarded(self):
+    def test_method_of_traits_lifted(self):
         obj = SimpleTraitedClass()
 
         self.assertEqual(obj.simple_method(), 'I am simple')
@@ -105,7 +105,7 @@ class TraitedTests(TestCase):
         self.assertEqual(obj.method_with_args(bar=2, foo=1, baz=3), 6)
         self.assertEqual(obj.method_with_args(1, 2, 3), 6)
 
-    def test_descriptor_of_traits_forwarded(self):
+    def test_descriptor_of_traits_lifted(self):
         obj = SimpleTraitedClass()
         self.assertEqual(obj.descriptor, 10)
 
