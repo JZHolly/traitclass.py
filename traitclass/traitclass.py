@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from functools import partial
 
 
@@ -18,7 +19,7 @@ def extends(cls, trait):
     return issubclass(cls_traitcls, trait)
 
 
-class TraitedMeta(type):
+class TraitedMeta(ABCMeta):
     def __new__(mcs, name, bases, attrs):
         cls = super(TraitedMeta, mcs).__new__(mcs, name, bases, attrs)
 
@@ -28,7 +29,7 @@ class TraitedMeta(type):
             error = 'Instances of metaclass {} expects a __traits__ defined!'
             raise IncorrectConfiguration(error.format(mcs.__class__.__name__))
 
-        trait_cls = type(name + 'Trait', traits, {})
+        trait_cls = ABCMeta(name + 'Trait', traits, {})
         cls.__traitclass__ = trait_cls
 
         old_getattr = getattr(cls, '__getattr__', None)
