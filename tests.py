@@ -1,3 +1,5 @@
+from abc import (ABCMeta, abstractmethod, abstractproperty,
+                 abstractstaticmethod, abstractclassmethod)
 from unittest import TestCase
 
 from traitclass.traitclass import TraitedMeta, IncorrectConfiguration
@@ -71,6 +73,74 @@ class GetAttrClass(metaclass=TraitedMeta):
         return True
 
 
+class AbstractTrait(metaclass=ABCMeta):
+    @abstractmethod
+    def abstract_method(self, arg, kwarg=None):
+        return
+
+    @property
+    @abstractmethod
+    def new_abstractproperty(self):
+        return
+
+    @abstractproperty
+    def old_abstractproperty(self):
+        return
+
+    @classmethod
+    @abstractmethod
+    def new_abstractclassmethod(cls, arg, kwarg=None):
+        return
+
+    @abstractclassmethod
+    def old_abstractclassmethod(cls, arg, kwarg=None):
+        return
+
+    @staticmethod
+    @abstractmethod
+    def new_abstractstaticmethod(arg, kwarg=None):
+        return
+
+    @abstractstaticmethod
+    def old_abstractstaticmethod(arg, kwarg=None):
+        return
+
+
+class AbstractlyTraited(metaclass=TraitedMeta):
+    __traits__  = (AbstractTrait, )
+
+
+class ReifiedAbstractlyTraited(metaclass=TraitedMeta):
+    __traits__ = (AbstractTrait, )
+
+    def abstract_method(self, arg, kwarg=None):
+        return (arg, kwarg)
+
+    @property
+    def new_abstractproperty(self):
+        return self
+
+    @property
+    def old_abstractproperty(self):
+        return self
+
+    @classmethod
+    def new_abstractclassmethod(cls, arg, kwarg=None):
+        return (arg, kwarg)
+
+    @classmethod
+    def old_abstractclassmethod(cls, arg, kwarg=None):
+        return (arg, kwarg)
+
+    @staticmethod
+    def new_abstractstaticmethod(arg, kwarg=None):
+        return (arg, kwarg)
+
+    @staticmethod
+    def old_abstractstaticmethod(arg, kwarg=None):
+        return (arg, kwarg)
+
+
 class TraitedTests(TestCase):
     def test_no_traits_raises_error(self):
         with self.assertRaises(IncorrectConfiguration):
@@ -137,3 +207,13 @@ class TraitedTests(TestCase):
 
         for trait in component_traits:
             self.assertTrue(subclass.__extends__(trait))
+
+    def test_abstractmethod_lifted(self):
+        self.assertEqual(AbstractlyTraited.__abstractmethods__,
+                         AbstractTrait.__abstractmethods__)
+
+        with self.assertRaises(TypeError):
+            AbstractlyTraited()
+
+    def test_abstractmethod_can_be_implemented_by_class(self):
+        ReifiedAbstractlyTraited()

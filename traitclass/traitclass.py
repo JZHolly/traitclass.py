@@ -32,6 +32,22 @@ class TraitedMeta(ABCMeta):
         trait_cls = ABCMeta(name + 'Trait', traits, {})
         cls.__traitclass__ = trait_cls
 
+        # lift abstract methods if they are defined on __traitclass__
+        if (hasattr(trait_cls, '__abstractmethods__') and
+            len(trait_cls.__abstractmethods__) > 0):
+
+            abstracts = set(getattr(trait_cls, '__abstractmethods__', []))
+
+            # pop the non-abstract implementations of the actual class
+            # from the lifted abstracts
+            cls_dict = {key
+                        for key, val in cls.__dict__.items()
+                        if not getattr(val, '__isabstractmethod__', False)}
+            abstracts.difference_update(cls_dict)
+            abstracts.union(trait_cls.__abstractmethods__)
+
+            cls.__abstractmethods__ = frozenset(abstracts)
+
         old_getattr = getattr(cls, '__getattr__', None)
 
         def getattr_from_trait_cls(obj, attr):
