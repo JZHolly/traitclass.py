@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/emintham/traitclass.py.svg?branch=master)](https://travis-ci.org/emintham/traitclass.py)
-
+[![Code Climate](https://codeclimate.com/github/emintham/traitclass.py/badges/gpa.svg)](https://codeclimate.com/github/emintham/traitclass.py)
 
 A Python implementation of an ongoing research into OOP language design.
 Everything is in flux and is unlikely to be useful to anyone at this point.

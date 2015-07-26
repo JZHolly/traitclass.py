@@ -2,7 +2,7 @@ from abc import (ABCMeta, abstractmethod, abstractproperty,
                  abstractstaticmethod, abstractclassmethod)
 from unittest import TestCase
 
-from traitclass.traitclass import TraitedMeta, IncorrectConfiguration
+from traitclass import TraitedMeta, IncorrectConfiguration
 
 
 class SimpleDescriptor(object):
@@ -107,7 +107,7 @@ class AbstractTrait(metaclass=ABCMeta):
 
 
 class AbstractlyTraited(metaclass=TraitedMeta):
-    __traits__  = (AbstractTrait, )
+    __traits__ = (AbstractTrait, )
 
 
 class ReifiedAbstractlyTraited(metaclass=TraitedMeta):
@@ -151,7 +151,7 @@ class TraitedTests(TestCase):
             TraitedMeta('NoTraits', (), {})
 
     def test_class_not_subclass_of_trait(self):
-        obj = SimpleTraitedClass()
+        SimpleTraitedClass()
         self.assertFalse(issubclass(SimpleTraitedClass, SimpleTrait))
 
     def test_trait_class_instantiated(self):

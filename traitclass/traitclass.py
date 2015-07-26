@@ -2,6 +2,9 @@ from abc import ABCMeta
 from functools import partial
 
 
+__all__ = ('IncorrectConfiguration', 'TraitedMeta')
+
+
 class IncorrectConfiguration(Exception):
     """Raised when TraitedMeta classes are incorrectly defined."""
 
@@ -20,6 +23,20 @@ def extends(cls, trait):
 
 
 class TraitedMeta(ABCMeta):
+    """
+    Metaclass for a class with traits.
+
+    We first take the __traits__ attribute and convert it into a class and
+    attach it as a __traitclass__ attribute on the traited class. Then, we
+    take the abstract methods of the __traitclass__ that are not implemented
+    on the traited class and attach them as abstract methods on the traited
+    class. We then forward __getattr__ lookups of the traited class to its
+    __traitclass__ to emulate the lifting/flattening of trait methods/attrs.
+
+    __extends__ is a convenience method to check if a class extends/includes
+    a particular trait.
+    """
+
     def __new__(mcs, name, bases, attrs):
         cls = super(TraitedMeta, mcs).__new__(mcs, name, bases, attrs)
 
@@ -53,8 +70,9 @@ class TraitedMeta(ABCMeta):
         def getattr_from_trait_cls(obj, attr):
             """
             Takes an object, an attribute and the object's __getattr__.
-            We first looks up the attribute on the object, if the attribute is not
-            found on the object, looks up the attribute on the objects __traitclass__
+            We first looks up the attribute on the object, if the attribute is
+            not found on the object, looks up the attribute on the object's
+            __traitclass__.
             """
             cls_name = obj.__class__.__name__
 
