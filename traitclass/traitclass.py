@@ -1,8 +1,8 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from functools import partial
 
 
-__all__ = ('IncorrectConfiguration', 'TraitedMeta')
+__all__ = ('IncorrectConfiguration', 'TraitedMeta', 'Trait')
 
 
 class IncorrectConfiguration(Exception):
@@ -55,6 +55,9 @@ class TraitedMeta(ABCMeta):
 
             abstracts = set(getattr(trait_cls, '__abstractmethods__', []))
 
+            # Pop abstract __init__ from traitclass
+            abstracts.discard('__init__')
+
             # pop the non-abstract implementations of the actual class
             # from the lifted abstracts
             cls_dict = {key
@@ -103,3 +106,14 @@ class TraitedMeta(ABCMeta):
         cls.__extends__ = classmethod(extends)
 
         return cls
+
+
+class Trait(metaclass=ABCMeta):
+    """
+    Base Trait class that every other Trait inherits from. Traits are never
+    instantiated and should not have instance variables.
+    """
+
+    @abstractmethod
+    def __init__(self):
+        return

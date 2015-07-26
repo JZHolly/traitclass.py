@@ -1,8 +1,8 @@
-from abc import (ABCMeta, abstractmethod, abstractproperty,
-                 abstractstaticmethod, abstractclassmethod)
+from abc import (abstractmethod, abstractproperty, abstractstaticmethod,
+                 abstractclassmethod)
 from unittest import TestCase
 
-from traitclass import TraitedMeta, IncorrectConfiguration
+from traitclass import TraitedMeta, IncorrectConfiguration, Trait
 
 
 class SimpleDescriptor(object):
@@ -16,7 +16,7 @@ class SimpleDescriptor(object):
         self.val = val
 
 
-class SimpleTrait(object):
+class SimpleTrait(Trait):
     __privateattr__ = 1
     descriptor = SimpleDescriptor(10)
 
@@ -47,7 +47,7 @@ class SubclassedTrait(SimpleTrait):
         return foo * bar
 
 
-class OtherTrait(object):
+class OtherTrait(Trait):
     pass
 
 
@@ -73,7 +73,7 @@ class GetAttrClass(metaclass=TraitedMeta):
         return True
 
 
-class AbstractTrait(metaclass=ABCMeta):
+class AbstractTrait(Trait):
     @abstractmethod
     def abstract_method(self, arg, kwarg=None):
         return
@@ -209,8 +209,17 @@ class TraitedTests(TestCase):
             self.assertTrue(subclass.__extends__(trait))
 
     def test_abstractmethod_lifted(self):
-        self.assertEqual(AbstractlyTraited.__abstractmethods__,
-                         AbstractTrait.__abstractmethods__)
+        """
+        All abstract method/property except __init__ should be lifted and
+        unimplemented abstracts on the traited class should cause it to not
+        be instantiable.
+        """
+        trait_abstracts = set(AbstractTrait.__abstractmethods__)
+        trait_abstracts.discard('__init__')
+
+        lifted_abstracts = set(AbstractlyTraited.__abstractmethods__)
+
+        self.assertEqual(trait_abstracts, lifted_abstracts)
 
         with self.assertRaises(TypeError):
             AbstractlyTraited()
